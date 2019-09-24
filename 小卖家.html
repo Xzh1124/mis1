@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        table,
+        tr,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        
+        td {
+            width: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <select id="region-select">
+                <option>华东</option>
+                <option>华北</option>
+                <option>华南</option>
+                <option>华西</option>
+               
+    </select>
+    <select id="class-select">
+            <option>手机</option>
+            <option>笔记本</option>
+            <option>智能音箱</option>
+          
+           
+</select> -->
+    <div id="region-radio-wrapper"></div>
+    <div id="product-radio-wrapper"></div>
+
+    <div id="table-wrapper">
+        <table>
+            <tr>
+                <td>商品</td>
+                <td>地区</td>
+                <td>1月</td>
+                <td>2月</td>
+                <td>3月</td>
+                <td>4月</td>
+                <td>5月</td>
+                <td>6月</td>
+                <td>7月</td>
+                <td>8月</td>
+                <td>9月</td>
+                <td>10月</td>
+                <td>11月</td>
+                <td>12月</td>
+            </tr>
+
+        </table>
+    </div>
+    <script>
+        let sourceData = [{
+            product: "笔记本",
+            region: "华南",
+            sale: [80, 120, 130, 140, 70, 75, 120, 90, 550, 120, 110, 100]
+        }, {
+            product: "手机",
+            region: "华东",
+            sale: [120, 100, 140, 160, 180, 185, 190, 210, 230, 245, 255, 270]
+        }, {
+            product: "手机",
+            region: "华北",
+            sale: [80, 70, 90, 110, 130, 145, 150, 160, 170, 185, 190, 200]
+        }, {
+            product: "手机",
+            region: "华南",
+            sale: [220, 200, 240, 250, 260, 270, 280, 295, 310, 335, 355, 380]
+        }, {
+            product: "笔记本",
+            region: "华东",
+            sale: [50, 60, 80, 110, 30, 20, 70, 30, 420, 30, 20, 20]
+        }, {
+            product: "笔记本",
+            region: "华北",
+            sale: [30, 35, 50, 70, 20, 15, 30, 50, 710, 130, 20, 20]
+        }, {
+            product: "智能音箱",
+            region: "华东",
+            sale: [10, 30, 4, 5, 6, 5, 4, 5, 6, 5, 5, 25]
+        }, {
+            product: "智能音箱",
+            region: "华北",
+            sale: [15, 50, 15, 15, 12, 11, 11, 12, 12, 14, 12, 40]
+        }, {
+            product: "智能音箱",
+            region: "华南",
+            sale: [10, 40, 10, 6, 5, 6, 8, 6, 6, 6, 7, 26]
+        }]
+
+
+        let productCheckbox = ['全选', '手机', '笔记本', '智能音箱'];
+        let regionCheckbox = ['全选', '华东', '华南', '华北'];
+        var region_select = [];
+        var product_select = [];
+        var table = document.querySelector('table');
+        var region_radio_wrapper = document.querySelector('#region-radio-wrapper');
+        var product_radio_wrapper = document.querySelector('#product-radio-wrapper');
+        // initTable();
+        // initTable()
+        generateCheckbox(region_radio_wrapper, regionCheckbox);
+        generateCheckbox(product_radio_wrapper, productCheckbox);
+
+
+        function generateCheckbox(div, arr) {
+            for (let i in arr) {
+                var checkbox = document.createElement('input');
+                var container = document.createElement('label');
+                var text = document.createTextNode(arr[i]);
+                checkbox.type = 'checkbox';
+                checkbox.value = arr[i];
+                if (arr[i] == '全选') {
+                    checkbox.checkboxType = 'all';
+                } else {
+                    checkbox.checkboxType = 'ds';
+                }
+                container.appendChild(checkbox);
+                container.appendChild(text);
+                div.appendChild(container);
+            }
+            div.onclick = function(e) {
+                if (e.target.type == "checkbox") {
+                    if (e.target.checkboxType == 'all') {
+                        allSelect(div);
+                    } else {
+                        singleSelect(div)
+                    }
+                }
+            }
+        }
+
+        function makeArr(arr, checkboxs) {
+            for (var i = 1; i < checkboxs.length; i++) {
+                if (checkboxs[i].checked) {
+                    arr.push(checkboxs[i].value);
+                }
+
+            }
+        }
+        region_radio_wrapper.onchange = function(e) {
+            var checkboxs = this.querySelectorAll('input');
+            region_select = [];
+            makeArr(region_select, checkboxs);
+            clearTable();
+            changeTable();
+        }
+        product_radio_wrapper.onchange = function(e) {
+            var checkboxs = this.querySelectorAll('input');
+            product_select = [];
+            makeArr(product_select, checkboxs);
+            clearTable();
+            changeTable();
+        }
+
+        //获取表格数据
+        function getData() {
+            var data = [];
+            for (let i in sourceData) {
+                if (product_select.indexOf(sourceData[i].product) != -1 && region_select.indexOf(sourceData[i].region) != -1) {
+                    data.push(sourceData[i]);
+                }
+            }
+
+
+            if (data.length == 0) {
+                for (let i in sourceData) {
+                    if (product_select.indexOf(sourceData[i].product) != -1) {
+                        data.push(sourceData[i]);
+                    } else if (region_select.indexOf(sourceData[i].region) != -1) {
+                        data.push(sourceData[i]);
+                    }
+                }
+            }
+            return data;
+        }
+
+        function allSelect(div) {
+            var checkboxs = div.querySelectorAll('input');
+
+            for (var i = 1; i < checkboxs.length; i++) {
+                checkboxs[i].checked = checkboxs[0].checked;
+            }
+        }
+
+        function singleSelect(obj) {
+            var flag = true;
+            var checkboxs = obj.querySelectorAll('input');
+            for (var i = 1; i < checkboxs.length; i++) {
+                if (!checkboxs[i].checked) {
+                    flag = false;
+                }
+                checkboxs[0].checked = flag;
+            }
+        }
+
+
+
+
+
+
+
+
+        function clearTable() {
+            for (let i = table.children.length - 1; i > 0; i--) { //要倒着遍历，否则会修改table的下标
+                table.removeChild(table.children[i])
+            }
+        }
+
+        function initTable() {
+            let data = [];
+            for (let i in sourceData) {
+                data.push(sourceData[i]);
+            }
+            var arr = data;
+            for (let i in arr) {
+                var tr = document.createElement('tr');
+                table.appendChild(tr);
+                for (let j in arr[i]) {
+                    if (j != 'sale') {
+                        var td = document.createElement('td');
+                        td.innerHTML = arr[i][j];
+                        tr.appendChild(td);
+                    } else {
+                        for (let k in arr[i][j]) {
+                            var td = document.createElement('td');
+                            td.innerHTML = arr[i][j][k];
+                            tr.appendChild(td);
+                        }
+                    }
+                }
+
+            }
+        }
+        // region_selet.onchange = function() {
+        //     clearTable();
+        //     changeTable();
+        // }
+
+        function sortArrByProduct(arr) {
+            arr.sort((a, b) => a.product.localeCompare(b.product, 'zh-CN'));
+        }
+
+        function sortArrByRegion(arr) {
+            arr.sort((a, b) => a.region.localeCompare(b.region, 'zh-CN'));
+        }
+
+        function clearRowSpan(arr) {
+            for (var i = 0; i < arr.length; i++) {
+                arr[i].rowspan = 1;
+            }
+        }
+
+
+        function changeTable() {
+            var arr = getData();
+            if (region_select.length == 1 && product_select.length > 1) {
+                sortArrByRegion(arr);
+                table.rows[0].cells[0].innerHTML = '地区';
+                table.rows[0].cells[1].innerHTML = '商品';
+                table1(arr);
+            } else {
+                sortArrByProduct(arr);
+                table.rows[0].cells[0].innerHTML = '商品';
+                table.rows[0].cells[1].innerHTML = '地区';
+                table2(arr);
+            }
+            marge();
+        }
+
+        function table1(arr) {
+
+            for (var i = 0; i < arr.length; i++) {
+
+                var tr = document.createElement('tr');
+                table.appendChild(tr);
+                for (let j in arr[i]) {
+                    if (j == 'product') {
+                        var td = document.createElement('td');
+                        td.innerHTML = arr[i]['region'];
+                        tr.appendChild(td);
+                    } else if (j == 'region') {
+                        var td = document.createElement('td');
+                        td.innerHTML = arr[i]['product'];
+                        tr.appendChild(td);
+                    } else {
+                        for (let k in arr[i][j]) {
+                            var td = document.createElement('td');
+                            td.innerHTML = arr[i][j][k];
+                            tr.appendChild(td);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        function table2(arr) {
+            for (var i = 0; i < arr.length; i++) {
+                var tr = document.createElement('tr');
+                table.appendChild(tr);
+                for (let j in arr[i]) {
+                    if (j != 'sale') {
+                        var td = document.createElement('td');
+                        td.innerHTML = arr[i][j];
+                        tr.appendChild(td);
+                    } else {
+                        for (let k in arr[i][j]) {
+                            var td = document.createElement('td');
+                            td.innerHTML = arr[i][j][k];
+                            tr.appendChild(td);
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+        function marge() {
+            table = document.querySelector('table');
+            for (var i = 1; i < table.rows.length;) {
+                var j = i + 1;
+                while (j < table.rows.length && table.rows[i].cells[0].innerHTML == table.rows[j].cells[0].innerHTML) {
+                    table.rows[i].cells[0].rowSpan++;
+                    table.rows[j].removeChild(table.rows[j].cells[0]);
+                    j++;
+                }
+                i = j;
+            }
+        }
+    </script>
+</body>
+
+</html>
